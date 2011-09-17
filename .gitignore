@@ -1,0 +1,7 @@
+/lib
+/bin
+/include
+*.egg-info
+.DS_Store
+__pycache__
+*.pyc
