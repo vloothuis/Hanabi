@@ -63,6 +63,7 @@ class ResourceHelper(object):
 
     def __init__(self, app):
         self.app = app
+        self._cached_resource_urls = {}
 
     def resource_urls(self, *resources):
         """Returns the URL's for the given resources.
@@ -74,6 +75,11 @@ class ResourceHelper(object):
         and resource contents. This makes it possible to cache the concatenated
         resources indefinitely.
         """
+        try:
+            return self._cached_resource_urls[resources]
+        except KeyError:
+            pass
+
         if self.app.debug_mode:
             urls = []
             for resource in resources:
@@ -83,11 +89,6 @@ class ResourceHelper(object):
                 urls.append(url + resource)
             return urls
 
-        try:
-            return self._cached_resource_urls
-        except AttributeError:
-            # FIXME: Cache on resources (key)
-            pass
         # Create a hash for all the resources. This will be used as the name of
         # the concatenated file.
         hash = hashlib.md5(self.resource_type)
@@ -116,8 +117,8 @@ class ResourceHelper(object):
         concat_path = os.path.join(cache_dir,  concat_name)
         shutil.move(concat_temp, concat_path)
 
-        self._cached_resource_urls = ['/static/_cache/' + concat_name]
-        return self._cached_resource_urls
+        return self._cached_resource_urls.setdefault(
+            resources, ['/static/_cache/' + concat_name])
 
     def __call__(self, *resources):
         raise NotImplementedError

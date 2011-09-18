@@ -93,8 +93,7 @@ class TestResourceHelper(object):
             with open(os.path.join(self.static_dir, text), 'w') as f:
                 f.write(text)
         urls1 = self.resource_helper.resource_urls('a', 'b')
-        another_helper = templateutils.ResourceHelper(self.app)
-        urls2 = another_helper.resource_urls('a')
+        urls2 = self.resource_helper.resource_urls('a')
         assert urls1 != urls2
 
     def test_check_for_non_existing_files(self):
