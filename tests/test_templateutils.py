@@ -88,6 +88,15 @@ class TestResourceHelper(object):
         urls2 = another_helper.resource_urls('a', 'b')
         assert urls1 != urls2
 
+    def test_cache_per_resource_set(self):
+        for text in ('a', 'b'):
+            with open(os.path.join(self.static_dir, text), 'w') as f:
+                f.write(text)
+        urls1 = self.resource_helper.resource_urls('a', 'b')
+        another_helper = templateutils.ResourceHelper(self.app)
+        urls2 = another_helper.resource_urls('a')
+        assert urls1 != urls2
+
     def test_check_for_non_existing_files(self):
         with pytest.raises(ValueError):
             self.resource_helper.resource_urls('a')
@@ -140,5 +149,5 @@ class TestJavascripInclude(object):
                 f.write(text)
         assert self.resource_helper('a', 'b') == (
             '<script type="text/javascript"'
-            ' src="/static/_cache/87a92b0060d787f724a10d8bcfdf46ca.js">'
+            ' src="/static/_cache/9b1757704f9f7cbf3672b6ca786cc6a1.js">'
             '</script>')

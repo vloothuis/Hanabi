@@ -86,11 +86,11 @@ class ResourceHelper(object):
         try:
             return self._cached_resource_urls
         except AttributeError:
+            # FIXME: Cache on resources (key)
             pass
         # Create a hash for all the resources. This will be used as the name of
         # the concatenated file.
         hash = hashlib.md5(self.resource_type)
-        map(hash.update, resources)
 
         static_dir = os.path.join(self.app.package_dir, 'static')
 
