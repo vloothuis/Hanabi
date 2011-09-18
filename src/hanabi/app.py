@@ -43,6 +43,7 @@ class WSGIController(object):
 class Application(object):
     controller_module = '.controllers'
     package = None
+    debug_mode = False
 
     def __init__(self):
         self.controllers = {}
@@ -56,6 +57,7 @@ class Application(object):
             autoescape=guess_autoescape,
             extensions=['jinja2.ext.autoescape'])
         self.templates.globals.update(
+            js_include=templateutils.JavascriptInclude(self),
             url_for=templateutils.URLFor(self))
         self.templates.filters['js_escape'] = templateutils.js_escape
 
@@ -68,6 +70,11 @@ class Application(object):
         except AttributeError:
             logging.warning('No __version__ specified for package: %s.'
                             ' Setting is strongly recommended.' % self.package)
+
+    @property
+    def package_dir(self):
+        package = importlib.import_module(self.package)
+        return os.path.abspath(os.path.dirname(package.__file__))
 
     def __call__(self, environ, start_response):
         # No extra trailing slashes allowed
@@ -156,6 +163,7 @@ class Application(object):
     @classmethod
     def run_develop(cls, **config):
         app = cls.create_app(**config)
+        app.debug_mode = True
         package = importlib.import_module(app.package)
         app = SharedDataMiddleware(app, {
             '/static': os.path.join(os.path.dirname(package.__file__), 'static')
